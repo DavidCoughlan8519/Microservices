@@ -1,0 +1,34 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.12.0 (0ab07be)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: news
+  name: news
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: news
+    spec:
+      containers:
+      - args:
+        - ./wait-for-it.sh
+        - -t
+        - "0"
+        - rabbitmq:5672
+        - --
+        - python
+        - NewsStreamer.py
+        image: davidcoughlandocker/news:v1News
+        name: news
+        imagePullPolicy: Always
+        resources: {}
+      restartPolicy: Always
+status: {}

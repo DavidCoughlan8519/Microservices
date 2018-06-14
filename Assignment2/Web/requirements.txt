@@ -1,0 +1,6 @@
+feedparser
+tweepy
+pika
+pymongo
+textblob
+flask

@@ -1,0 +1,8 @@
+feedparser
+IPython
+praw
+tweepy
+pika
+pymongo
+textblob
+flask

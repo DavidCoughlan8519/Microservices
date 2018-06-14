@@ -1,0 +1,56 @@
+version: '3'
+services:
+  web:
+    build: ./Web
+    depends_on:
+      - rabbitmq
+      - mongo
+    ports:
+      - "5000:5000"
+    networks:
+      - DavidNet
+    command: ["./wait-for-it.sh", "-t", "0", "rabbitmq:5672", "--" ,"python", "twitterweb.py"]
+  news:
+    build: ./NewsStreamer 
+    depends_on:
+      - rabbitmq
+      - mongo
+    networks:
+      - DavidNet
+    command: ["./wait-for-it.sh", "-t", "0", "rabbitmq:5672", "--" ,"python", "NewsStreamer.py"]
+  twitter:
+    build: ./TwitterStreamer
+    depends_on:
+      - rabbitmq
+      - mongo
+    networks:
+      - DavidNet
+    command: ["./wait-for-it.sh", "-t", "0", "rabbitmq:5672", "--" ,"python", "twitterclient.py"]
+  server:
+    build: ./Sentiment
+    depends_on:
+      - rabbitmq
+      - mongo
+      - twitter
+      - news
+    networks:
+      - DavidNet
+    command: ["./wait-for-it.sh", "-t", "0", "rabbitmq:5672", "--" ,"python", "TwitterSentiment1.py"]
+  mongo:
+    image: mongo:3.0.2
+    ports:
+      - 27017:27017
+    networks:
+      - DavidNet
+  rabbitmq:
+    image: rabbitmq:3.6.1-management
+    networks:
+        - DavidNet
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    ports:
+      - "8023:15672"
+      - "8024:5672"
+networks:
+    DavidNet:
